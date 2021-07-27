@@ -1,16 +1,6 @@
-buildscript {
-    ext.kotlin_version = '1.5.20'
-    repositories { mavenCentral() }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
-    }
-}
-
 plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.2'
     id 'org.jetbrains.kotlin.jvm' version '1.4.30'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.20'
 }
 
 repositories {
@@ -31,8 +21,8 @@ dependencies {
     // Logging
     compile "ch.qos.logback:logback-classic:1.2.3"
 
-    // Serialization
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2"
+    // Gson
+    implementation "com.google.code.gson:gson:2.8.7"
 }
 
 compileKotlin { kotlinOptions.jvmTarget = "1.8" }

@@ -1,25 +1,58 @@
 package dev.kotlinautas.bot.commands
 
-import com.github.philippheuer.events4j.simple.SimpleEventHandler
+import com.github.twitch4j.chat.TwitchChat
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent
+import com.google.gson.Gson
+import dev.kotlinautas.bot.interfaces.ICommand
+import dev.kotlinautas.bot.models.Ticket
 import dev.kotlinautas.bot.models.Viewer
+import java.io.File
+import java.util.*
 
-class MegaSena(eventHandler: SimpleEventHandler) : CommandBase(eventHandler) {
-    private val viewers = mutableListOf<String>()
+class MegaSena() : ICommand {
+    private val viewers = mutableListOf<Viewer>()
+    private val random = Random()
+    private val gson = Gson()
 
-    fun saveViewer(viewer: Viewer) {
-        if (viewer.username !in viewers) {
-            viewers.add(viewer.username)
+    private fun saveViewer(viewer: Viewer, twitchChat: TwitchChat, channel: String) {
+        if (!viewers.contains(viewer)) {
+            viewers.add(viewer)
+
+            val viewersJson = gson.toJson(viewers)
+            val viewersFile = File("viewers.json")
+
+            if (!viewersFile.exists()) viewersFile.createNewFile()
+
+            viewersFile.writeText(viewersJson)
+
+            val message = "${viewer.username} você recebeu ${viewer.subscriber + 1} ticket!"
+
+            twitchChat.sendMessage(channel, message)
         }
     }
 
-    override fun onChannelMessage(event: ChannelMessageEvent) {
-//        val viewer = Viewer(event.)
+    override fun onChannelMessage(event: ChannelMessageEvent, twitchChat: TwitchChat) {
+        when (event.message) {
+            "!ticket" -> {
+                val viewer = Viewer(event.user.name, event.subscriptionTier)
 
-        super.onChannelMessage(event)
+                saveViewer(viewer, twitchChat, event.channel.name)
+            }
+            "!sortear" -> {
+                if (event.channel.name == event.user.name) {
+                    val tickets = mutableListOf<Ticket>()
 
-        println(event)
-//        println(event.user.name)
-//        println(event.subscriptionTier)
+                    viewers.forEach {
+                        for (i in 0..it.subscriber) {
+                            tickets.add(Ticket(UUID.randomUUID().toString(), it))
+                        }
+                    }
+
+                    tickets.shuffle()
+
+                    twitchChat.sendMessage(event.channel.name, "${tickets[random.nextInt(tickets.size)].viewer.username} ganhou o sorteio!")
+                }
+            }
+        }
     }
 }

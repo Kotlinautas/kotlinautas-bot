@@ -3,11 +3,11 @@ package dev.kotlinautas.bot
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential
-import com.github.philippheuer.events4j.simple.SimpleEventHandler
 import com.github.twitch4j.TwitchClient
 import com.github.twitch4j.TwitchClientBuilder
+import com.github.twitch4j.chat.events.channel.ChannelMessageEvent
 import dev.kotlinautas.bot.commands.MegaSena
-import dev.kotlinautas.bot.features.SocialMedias
+import dev.kotlinautas.bot.interfaces.ICommand
 import kotlin.system.exitProcess
 
 object Bot {
@@ -19,15 +19,20 @@ object Bot {
     /** Holds the client */
     private val twitchClient: TwitchClient = createClient()
 
+    private val commands = mutableListOf<ICommand>()
+
     /** Register all features */
     fun registerFeatures() {
-        val eventHandler = twitchClient.eventManager.getEventHandler(SimpleEventHandler::class.java)
-        SocialMedias(eventHandler)
-        MegaSena(eventHandler)
+        twitchClient.chat.eventManager.onEvent(ChannelMessageEvent::class.java) {
+                msg ->
+                    commands.forEach { it.onChannelMessage(msg, twitchClient.chat) }
+        }
     }
 
     /** Start the bot, connecting it to every channel specified in the configuration */
     fun start() {
+        commands.add(MegaSena())
+
         // Connect to all channels
         for (channel in configuration.channels) {
             twitchClient.chat.joinChannel(channel)
