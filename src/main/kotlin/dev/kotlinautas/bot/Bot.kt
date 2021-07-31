@@ -7,6 +7,7 @@ import com.github.twitch4j.TwitchClient
 import com.github.twitch4j.TwitchClientBuilder
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent
 import dev.kotlinautas.bot.commands.MegaSena
+import dev.kotlinautas.bot.commands.Sociais
 import dev.kotlinautas.bot.interfaces.ICommand
 import kotlin.system.exitProcess
 
@@ -32,6 +33,7 @@ object Bot {
     /** Start the bot, connecting it to every channel specified in the configuration */
     fun start() {
         commands.add(MegaSena())
+        commands.add(Sociais())
 
         // Connect to all channels
         for (channel in configuration.channels) {
