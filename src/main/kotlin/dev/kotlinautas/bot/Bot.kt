@@ -32,7 +32,11 @@ object Bot {
 
     /** Start the bot, connecting it to every channel specified in the configuration */
     fun start() {
-        commands.add(MegaSena())
+        val megaSena = MegaSena()
+
+        megaSena.loadData()
+
+        commands.add(megaSena)
         commands.add(Sociais())
 
         // Connect to all channels
