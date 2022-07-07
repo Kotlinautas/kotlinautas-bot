@@ -3,14 +3,12 @@ package dev.kotlinautas.bot.commands
 import com.github.twitch4j.chat.TwitchChat
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent
 import com.google.gson.Gson
-import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import dev.kotlinautas.bot.interfaces.ICommand
 import dev.kotlinautas.bot.models.Ticket
 import dev.kotlinautas.bot.models.Viewer
 import java.io.File
 import java.util.*
-import javax.swing.text.View
 
 class MegaSena : ICommand {
     private val viewers = mutableListOf<Viewer>()
